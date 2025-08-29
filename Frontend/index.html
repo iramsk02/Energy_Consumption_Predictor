@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Energy Consumption Predictor</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 50px; }
+    .container { max-width: 500px; margin: auto; }
+    label { display: block; margin-top: 10px; }
+    input { width: 100%; padding: 8px; margin-top: 5px; }
+    button { margin-top: 15px; padding: 10px; width: 100%; background: #007BFF; color: white; border: none; cursor: pointer; }
+    button:hover { background: #0056b3; }
+    #result { margin-top: 20px; font-weight: bold; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>⚡ Energy Consumption Predictor</h2>
+    
+    <form id="predictForm">
+      <label>Global Reactive Power:</label>
+      <input type="number" step="any" id="grp" value="0.418" required>
+
+      <label>Voltage:</label>
+      <input type="number" step="any" id="volt" value="234.84" required>
+
+      <label>Global Intensity:</label>
+      <input type="number" step="any" id="intensity" value="18.4" required>
+
+      <label>Sub Metering 1:</label>
+      <input type="number" step="any" id="sm1" value="0.0" required>
+
+      <label>Sub Metering 2:</label>
+      <input type="number" step="any" id="sm2" value="1.0" required>
+
+      <label>Sub Metering 3:</label>
+      <input type="number" step="any" id="sm3" value="17.0" required>
+
+      <label>Avg Intensity 1h:</label>
+      <input type="number" step="any" id="ai1h" value="19.2" required>
+
+      <label>Avg Intensity 1d:</label>
+      <input type="number" step="any" id="ai1d" value="17.6" required>
+
+      <button type="submit">Predict</button>
+    </form>
+
+    <div id="result"></div>
+  </div>
+
+  <script>
+    document.getElementById("predictForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+
+      const data = {
+        Global_reactive_power: parseFloat(document.getElementById("grp").value),
+        Voltage: parseFloat(document.getElementById("volt").value),
+        Global_intensity: parseFloat(document.getElementById("intensity").value),
+        Sub_metering_1: parseFloat(document.getElementById("sm1").value),
+        Sub_metering_2: parseFloat(document.getElementById("sm2").value),
+        Sub_metering_3: parseFloat(document.getElementById("sm3").value),
+        Avg_Intensity_1h: parseFloat(document.getElementById("ai1h").value),
+        Avg_Intensity_1d: parseFloat(document.getElementById("ai1d").value)
+      };
+
+      const response = await fetch("http://127.0.0.1:8000/predict", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.json();
+      document.getElementById("result").innerText =
+        "🔮 Predicted Global Active Power: " + result.predicted_Global_active_power.toFixed(4);
+    });
+  </script>
+</body>
+</html>
